@@ -6,32 +6,18 @@ import config._
 import diplomacy._
 import coreplex._
 import rocketchip._
-import uncore.devices.DebugBusIO
-import sifive.blocks.devices.gpio.{GPIOConfig, PeripheryGPIO, PeripheryGPIOBundle, PeripheryGPIOModule, GPIOPin, GPIOPinToIOF, GPIOPinIOFCtrl, GPIOInputPinCtrl, JTAGPinsIO, JTAGGPIOPort}
-import sifive.blocks.devices.mockaon.{MockAONConfig, PeripheryMockAON, PeripheryMockAONBundle, PeripheryMockAONModule, MockAONWrapperPadsIO}
-import sifive.blocks.devices.pwm.{PWMConfig, PeripheryPWM, PeripheryPWMBundle, PeripheryPWMModule, PWMGPIOPort}
-import sifive.blocks.devices.spi.{SPIConfig, PeripherySPI, PeripherySPIBundle, PeripherySPIModule, SPIFlashConfig, PeripherySPIFlash, PeripherySPIFlashBundle, PeripherySPIFlashModule, SPIPinsIO, SPIGPIOPort}
-import sifive.blocks.devices.uart.{UARTConfig, PeripheryUART, PeripheryUARTBundle, PeripheryUARTModule, UARTGPIOPort}
+import jtag._
+import sifive.blocks.devices.gpio.{PeripheryGPIOKey, HasPeripheryGPIO, HasPeripheryGPIOBundle, HasPeripheryGPIOModule, GPIOPin, GPIOPinToIOF, GPIOPinIOFCtrl, GPIOInputPinCtrl, JTAGPinsIO, JTAGGPIOPort}
+import sifive.blocks.devices.mockaon.{PeripheryMockAONKey, HasPeripheryMockAON, HasPeripheryMockAONBundle, HasPeripheryMockAONModule, MockAONWrapperPadsIO}
+import sifive.blocks.devices.pwm.{PeripheryPWMKey, HasPeripheryPWM, HasPeripheryPWMBundle, HasPeripheryPWMModule, PWMGPIOPort}
+import sifive.blocks.devices.spi.{PeripherySPIKey, HasPeripherySPI, HasPeripherySPIBundle, HasPeripherySPIModule, PeripherySPIFlashKey, HasPeripherySPIFlash, HasPeripherySPIFlashBundle, HasPeripherySPIFlashModule, SPIPinsIO, SPIGPIOPort}
+import sifive.blocks.devices.uart.{PeripheryUARTKey, HasPeripheryUART, HasPeripheryUARTBundle, HasPeripheryUARTModule, UARTGPIOPort}
 import sifive.blocks.util.ResetCatchAndSync
 import util._
 
 // Coreplex and Periphery
-
-trait E300ArtyDevKitPeripheryConfigs {
-  val mockAONConfig = MockAONConfig(address = 0x10000000)
-  val gpioConfig = GPIOConfig(address = 0x10012000, width = 32)
-  val pwmConfigs = List(
-    PWMConfig(address = 0x10015000, cmpWidth = 8),
-    PWMConfig(address = 0x10025000, cmpWidth = 16),
-    PWMConfig(address = 0x10035000, cmpWidth = 16))
-  val spiConfigs = List(
-    SPIConfig(csWidth = 4, rAddress = 0x10024000, sampleDelay = 3),
-    SPIConfig(csWidth = 1, rAddress = 0x10034000, sampleDelay = 3))
-  val spiFlashConfig = SPIFlashConfig(
-    fAddress = 0x20000000, rAddress = 0x10014000, sampleDelay = 3)
-  val uartConfigs = List(
-    UARTConfig(address = 0x10013000),
-    UARTConfig(address = 0x10023000))
+trait PeripheryDebugTRSTnBundle extends PeripheryDebugBundle {
+  override val jtag = (p(IncludeJtagDTM)).option(new JTAGIO(hasTRSTn = true).flip)
 }
 
 // This custom E300ArtyDevKit coreplex has no port into the L2 and no memory subsystem
@@ -39,31 +25,30 @@ trait E300ArtyDevKitPeripheryConfigs {
 class E300ArtyDevKitCoreplex(implicit p: Parameters) extends BareCoreplex
     with CoreplexNetwork
     with CoreplexRISCVPlatform
-    with RocketTiles {
+    with HasRocketTiles {
   override lazy val module = new E300ArtyDevKitCoreplexModule(this, () => new E300ArtyDevKitCoreplexBundle(this))
 }
 
 class E300ArtyDevKitCoreplexBundle[+L <: E300ArtyDevKitCoreplex](_outer: L) extends BareCoreplexBundle(_outer)
     with CoreplexNetworkBundle
     with CoreplexRISCVPlatformBundle
-    with RocketTilesBundle
+    with HasRocketTilesBundle
 
 class E300ArtyDevKitCoreplexModule[+L <: E300ArtyDevKitCoreplex, +B <: E300ArtyDevKitCoreplexBundle[L]](_outer: L, _io: () => B)
   extends BareCoreplexModule(_outer, _io)
     with CoreplexNetworkModule
     with CoreplexRISCVPlatformModule
-    with RocketTilesModule
+    with HasRocketTilesModule
 
 class E300ArtyDevKitSystem(implicit p: Parameters) extends BaseTop
-    with E300ArtyDevKitPeripheryConfigs
     with PeripheryBootROM
     with PeripheryDebug
-    with PeripheryMockAON
-    with PeripheryUART
-    with PeripherySPIFlash
-    with PeripherySPI
-    with PeripheryGPIO
-    with PeripheryPWM
+    with HasPeripheryMockAON
+    with HasPeripheryUART
+    with HasPeripherySPIFlash
+    with HasPeripherySPI
+    with HasPeripheryGPIO
+    with HasPeripheryPWM
     with HardwiredResetVector {
   override lazy val module = new E300ArtyDevKitSystemModule(this, () => new E300ArtyDevKitSystemBundle(this))
 
@@ -73,42 +58,40 @@ class E300ArtyDevKitSystem(implicit p: Parameters) extends BaseTop
 }
 
 class E300ArtyDevKitSystemBundle[+L <: E300ArtyDevKitSystem](_outer: L) extends BaseTopBundle(_outer)
-    with E300ArtyDevKitPeripheryConfigs
     with PeripheryBootROMBundle
-    with PeripheryDebugBundle
-    with PeripheryUARTBundle
-    with PeripherySPIBundle
-    with PeripheryGPIOBundle
-    with PeripherySPIFlashBundle
-    with PeripheryMockAONBundle
-    with PeripheryPWMBundle
+    with PeripheryDebugTRSTnBundle
+    with HasPeripheryUARTBundle
+    with HasPeripherySPIBundle
+    with HasPeripheryGPIOBundle
+    with HasPeripherySPIFlashBundle
+    with HasPeripheryMockAONBundle
+    with HasPeripheryPWMBundle
     with HardwiredResetVectorBundle
 
 class E300ArtyDevKitSystemModule[+L <: E300ArtyDevKitSystem, +B <: E300ArtyDevKitSystemBundle[L]](_outer: L, _io: () => B)
   extends BaseTopModule(_outer, _io)
-    with E300ArtyDevKitPeripheryConfigs
     with PeripheryBootROMModule
     with PeripheryDebugModule
-    with PeripheryUARTModule
-    with PeripherySPIModule
-    with PeripheryGPIOModule
-    with PeripherySPIFlashModule
-    with PeripheryMockAONModule
-    with PeripheryPWMModule
+    with HasPeripheryUARTModule
+    with HasPeripherySPIModule
+    with HasPeripheryGPIOModule
+    with HasPeripherySPIFlashModule
+    with HasPeripheryMockAONModule
+    with HasPeripheryPWMModule
     with HardwiredResetVectorModule
 
 // Top
 
-class E300ArtyDevKitTopIO(implicit val p: Parameters) extends Bundle with E300ArtyDevKitPeripheryConfigs {
+class E300ArtyDevKitTopIO(implicit val p: Parameters) extends Bundle {
   val pads = new Bundle {
-    val jtag = new JTAGPinsIO
-    val gpio = Vec(gpioConfig.width, new GPIOPin)
-    val qspi = new SPIPinsIO(spiFlashConfig)
+    val jtag = new JTAGPinsIO(hasTRSTn = true)
+    val gpio = Vec(p(PeripheryGPIOKey).width, new GPIOPin)
+    val qspi = new SPIPinsIO(p(PeripherySPIFlashKey))
     val aon = new MockAONWrapperPadsIO()
   }
 }
 
-class E300ArtyDevKitTop(implicit val p: Parameters) extends Module with E300ArtyDevKitPeripheryConfigs {
+class E300ArtyDevKitTop(implicit val p: Parameters) extends Module {
   val sys = Module(LazyModule(new E300ArtyDevKitSystem).module)
   val io = new E300ArtyDevKitTopIO
 
@@ -133,9 +116,9 @@ class E300ArtyDevKitTop(implicit val p: Parameters) extends Module with E300Arty
   val sys_pwms  = sys.io.pwms
   val sys_spis   = sys.io.spis
 
-  val uart_pins = uartConfigs.map { c => Module (new UARTGPIOPort) }
-  val pwm_pins  = pwmConfigs.map  { c => Module (new PWMGPIOPort(c.bc)) }
-  val spi_pins  = spiConfigs.map  { c => Module (new SPIGPIOPort(c)) }
+  val uart_pins = p(PeripheryUARTKey).map { c => Module (new UARTGPIOPort) }
+  val pwm_pins  = p(PeripheryPWMKey).map  { c => Module (new PWMGPIOPort(c)) }
+  val spi_pins  = p(PeripherySPIKey).map  { c => Module (new SPIGPIOPort(c)) }
 
   (uart_pins zip sys_uarts) map {case (p, r) => p.io.uart <> r}
   (pwm_pins zip  sys_pwms)  map {case (p, r) => p.io.pwm  <> r}
@@ -208,7 +191,7 @@ class E300ArtyDevKitTop(implicit val p: Parameters) extends Module with E300Arty
   // Result of Pin Mux
   io.pads.gpio <> sys.io.gpio.pins
 
-  val dedicated_spi_pins = Module (new SPIGPIOPort(spiFlashConfig, syncStages=3, driveStrength=Bool(true)))
+  val dedicated_spi_pins = Module (new SPIGPIOPort(p(PeripherySPIFlashKey), syncStages=3, driveStrength=Bool(true)))
   dedicated_spi_pins.clock := sys.clock
   dedicated_spi_pins.reset := sys.reset
   io.pads.qspi <> dedicated_spi_pins.io.pins
@@ -223,7 +206,7 @@ class E300ArtyDevKitTop(implicit val p: Parameters) extends Module with E300Arty
   // This will require 3 ticks of TCK before the debug logic
   // comes out of reset, but JTAG needs 5 ticks anyway.
   // This means that the "real" TRST is never actually used in this design.
-  sys.io.jtag.get.TRST := ResetCatchAndSync(sys.io.jtag.get.TCK, async_corerst)
+  sys.io.jtag.get.TRSTn.get := ResetCatchAndSync(sys.io.jtag.get.TCK, async_corerst)
 
   // AON Pads
   io.pads.aon <> sys.io.aon.pads

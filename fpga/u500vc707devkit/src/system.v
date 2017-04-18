@@ -99,12 +99,12 @@ U500VC707DevKitTop top
   .io_gpio_pins_2_o_ds(),
   .io_gpio_pins_3_o_ds(),
   //JTAG
-  .io_jtag_TRST(1'b0),
+  .io_jtag_TRSTn(1'b0),
   .io_jtag_TCK(jtag_TCK),
   .io_jtag_TMS(jtag_TMS),
   .io_jtag_TDI(jtag_TDI),
-  .io_jtag_DRV_TDO(),
-  .io_jtag_TDO(jtag_TDO),
+  .io_jtag_TDO_driven(),
+  .io_jtag_TDO_data(jtag_TDO),
   //MIG
   .io_xilinxvc707mig__inout_ddr3_dq(ddr3_dq),
   .io_xilinxvc707mig__inout_ddr3_dqs_n(ddr3_dqs_n),

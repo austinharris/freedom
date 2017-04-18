@@ -11,18 +11,17 @@ rocketchip_dir := $(base_dir)/rocket-chip
 sifiveblocks_dir := $(base_dir)/sifive-blocks
 EXTRA_FPGA_VSRCS := \
 	$(rocketchip_dir)/vsrc/AsyncResetReg.v \
-	$(rocketchip_dir)/vsrc/DebugTransportModuleJtag.v \
 	$(sifiveblocks_dir)/vsrc/SRLatch.v \
 	$(sifiveblocks_dir)/vsrc/vc707reset.v
 
 PATCHVERILOG = \
 sed -i -s "s/ *output\(.*\)__inout\(.*\)/inout \1__inout\2/g" $@ && \
-grep -q -F   "    .io_xilinxvc707mig__inout_ddr3_dq(U500VC707DevKitSystem_1_io_xilinxvc707mig__inout_ddr3_dq)," $@ && \
-sed -i -s  "s/    .io_xilinxvc707mig__inout_ddr3_dq(U500VC707DevKitSystem_1_io_xilinxvc707mig__inout_ddr3_dq),/    .io_xilinxvc707mig__inout_ddr3_dq(io_xilinxvc707mig__inout_ddr3_dq),/g" $@ && \
-grep -q -F   "    .io_xilinxvc707mig__inout_ddr3_dqs_n(U500VC707DevKitSystem_1_io_xilinxvc707mig__inout_ddr3_dqs_n)," $@ && \
-sed -i -s  "s/    .io_xilinxvc707mig__inout_ddr3_dqs_n(U500VC707DevKitSystem_1_io_xilinxvc707mig__inout_ddr3_dqs_n),/    .io_xilinxvc707mig__inout_ddr3_dqs_n(io_xilinxvc707mig__inout_ddr3_dqs_n),/g" $@ && \
-grep -q -F   "    .io_xilinxvc707mig__inout_ddr3_dqs_p(U500VC707DevKitSystem_1_io_xilinxvc707mig__inout_ddr3_dqs_p)," $@ && \
-sed -i -s  "s/    .io_xilinxvc707mig__inout_ddr3_dqs_p(U500VC707DevKitSystem_1_io_xilinxvc707mig__inout_ddr3_dqs_p),/    .io_xilinxvc707mig__inout_ddr3_dqs_p(io_xilinxvc707mig__inout_ddr3_dqs_p),/g" $@ && \
+grep -q -F   "    .io_xilinxvc707mig__inout_ddr3_dq(U500VC707DevKitSystem_io_xilinxvc707mig__inout_ddr3_dq)," $@ && \
+sed -i -s  "s/    .io_xilinxvc707mig__inout_ddr3_dq(U500VC707DevKitSystem_io_xilinxvc707mig__inout_ddr3_dq),/    .io_xilinxvc707mig__inout_ddr3_dq(io_xilinxvc707mig__inout_ddr3_dq),/g" $@ && \
+grep -q -F   "    .io_xilinxvc707mig__inout_ddr3_dqs_n(U500VC707DevKitSystem_io_xilinxvc707mig__inout_ddr3_dqs_n)," $@ && \
+sed -i -s  "s/    .io_xilinxvc707mig__inout_ddr3_dqs_n(U500VC707DevKitSystem_io_xilinxvc707mig__inout_ddr3_dqs_n),/    .io_xilinxvc707mig__inout_ddr3_dqs_n(io_xilinxvc707mig__inout_ddr3_dqs_n),/g" $@ && \
+grep -q -F   "    .io_xilinxvc707mig__inout_ddr3_dqs_p(U500VC707DevKitSystem_io_xilinxvc707mig__inout_ddr3_dqs_p)," $@ && \
+sed -i -s  "s/    .io_xilinxvc707mig__inout_ddr3_dqs_p(U500VC707DevKitSystem_io_xilinxvc707mig__inout_ddr3_dqs_p),/    .io_xilinxvc707mig__inout_ddr3_dqs_p(io_xilinxvc707mig__inout_ddr3_dqs_p),/g" $@ && \
 grep -q -F   "    .io_port__inout_ddr3_dq(xilinxvc707mig_io_port__inout_ddr3_dq)," $@ && \
 sed -i -s  "s/    .io_port__inout_ddr3_dq(xilinxvc707mig_io_port__inout_ddr3_dq),/    .io_port__inout_ddr3_dq(io_xilinxvc707mig__inout_ddr3_dq),/g" $@ && \
 grep -q -F   "    .io_port__inout_ddr3_dqs_n(xilinxvc707mig_io_port__inout_ddr3_dqs_n)," $@ && \
