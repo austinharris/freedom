@@ -1,0 +1,39 @@
+# See LICENSE for license details.
+base_dir := $(patsubst %/,%,$(dir $(abspath $(lastword $(MAKEFILE_LIST)))))
+BUILD_DIR := $(base_dir)/builds/u500vu190devkit
+FPGA_DIR := $(base_dir)/fpga/u500vu190devkit
+MODEL := U500VU190DevKitTop
+PROJECT := sifive.freedom.unleashed.u500vu190devkit
+CONFIG_PROJECT := sifive.freedom.unleashed.u500vu190devkit
+CONFIG := U500VU190DevKitConfig
+
+rocketchip_dir := $(base_dir)/rocket-chip
+sifiveblocks_dir := $(base_dir)/sifive-blocks
+EXTRA_FPGA_VSRCS := \
+	$(rocketchip_dir)/vsrc/AsyncResetReg.v \
+	$(sifiveblocks_dir)/vsrc/SRLatch.v \
+	$(FPGA_DIR)/src/system.v
+
+
+PATCHVERILOG = \
+sed -i -s "s/ *output\(.*\)__inout\(.*\)/inout \1__inout\2/g" $@ && \
+grep -q -F   "    .io_xilinxvu190xdma__inout_c0_ddr4_dq(U500VU190DevKitSystem_io_xilinxvu190xdma__inout_c0_ddr4_dq)," $@ && \
+sed -i -s  "s/    .io_xilinxvu190xdma__inout_c0_ddr4_dq(U500VU190DevKitSystem_io_xilinxvu190xdma__inout_c0_ddr4_dq),/    .io_xilinxvu190xdma__inout_c0_ddr4_dq(io_xilinxvu190xdma__inout_c0_ddr4_dq),/g" $@ && \
+grep -q -F   "    .io_xilinxvu190xdma__inout_c0_ddr4_dqs_c(U500VU190DevKitSystem_io_xilinxvu190xdma__inout_c0_ddr4_dqs_c)," $@ && \
+sed -i -s  "s/    .io_xilinxvu190xdma__inout_c0_ddr4_dqs_c(U500VU190DevKitSystem_io_xilinxvu190xdma__inout_c0_ddr4_dqs_c),/    .io_xilinxvu190xdma__inout_c0_ddr4_dqs_c(io_xilinxvu190xdma__inout_c0_ddr4_dqs_c),/g" $@ && \
+grep -q -F   "    .io_xilinxvu190xdma__inout_c0_ddr4_dqs_t(U500VU190DevKitSystem_io_xilinxvu190xdma__inout_c0_ddr4_dqs_t)," $@ && \
+sed -i -s  "s/    .io_xilinxvu190xdma__inout_c0_ddr4_dqs_t(U500VU190DevKitSystem_io_xilinxvu190xdma__inout_c0_ddr4_dqs_t),/    .io_xilinxvu190xdma__inout_c0_ddr4_dqs_t(io_xilinxvu190xdma__inout_c0_ddr4_dqs_t),/g" $@ && \
+grep -q -F   "    .io_port__inout_c0_ddr4_dq(xilinxvu190xdma_io_port__inout_c0_ddr4_dq)," $@ && \
+sed -i -s  "s/    .io_port__inout_c0_ddr4_dq(xilinxvu190xdma_io_port__inout_c0_ddr4_dq),/    .io_port__inout_c0_ddr4_dq(io_xilinxvu190xdma__inout_c0_ddr4_dq),/g" $@ && \
+grep -q -F   "    .io_port__inout_c0_ddr4_dqs_c(xilinxvu190xdma_io_port__inout_c0_ddr4_dqs_c)," $@ && \
+sed -i -s  "s/    .io_port__inout_c0_ddr4_dqs_c(xilinxvu190xdma_io_port__inout_c0_ddr4_dqs_c),/    .io_port__inout_c0_ddr4_dqs_c(io_xilinxvu190xdma__inout_c0_ddr4_dqs_c),/g" $@ && \
+grep -q -F   "    .io_port__inout_c0_ddr4_dqs_t(xilinxvu190xdma_io_port__inout_c0_ddr4_dqs_t)" $@ && \
+sed -i -s  "s/    .io_port__inout_c0_ddr4_dqs_t(xilinxvu190xdma_io_port__inout_c0_ddr4_dqs_t)/    .io_port__inout_c0_ddr4_dqs_t(io_xilinxvu190xdma__inout_c0_ddr4_dqs_t)/g" $@ && \
+grep -q -F   "   .c0_ddr4_dq(blackbox_c0_ddr4_dq)," $@ && \
+sed -i -s  "s/   .c0_ddr4_dq(blackbox_c0_ddr4_dq),/   .c0_ddr4_dq(io_port__inout_c0_ddr4_dq),/g" $@ && \
+grep -q -F   "   .c0_ddr4_dqs_c(blackbox_c0_ddr4_dqs_c)," $@ && \
+sed -i -s  "s/   .c0_ddr4_dqs_c(blackbox_c0_ddr4_dqs_c),/   .c0_ddr4_dqs_c(io_port__inout_c0_ddr4_dqs_c),/g" $@ && \
+grep -q -F   "   .c0_ddr4_dqs_t(blackbox_c0_ddr4_dqs_t)," $@ && \
+sed -i -s  "s/   .c0_ddr4_dqs_t(blackbox_c0_ddr4_dqs_t),/   .c0_ddr4_dqs_t(io_port__inout_c0_ddr4_dqs_t),/g" $@ 
+
+include common.mk

@@ -58,6 +58,15 @@ $(mcs): $(verilog)
 .PHONY: mcs
 mcs: $(mcs)
 
+# Build .bit
+bit := $(BUILD_DIR)/$(CONFIG_PROJECT).$(CONFIG).bit
+$(bit): $(verilog)
+	VSRC_TOP=$(verilog) EXTRA_VSRCS="$(EXTRA_FPGA_VSRCS)" $(MAKE) -C $(FPGA_DIR) bit
+	cp $(FPGA_DIR)/obj/system.bit $@
+
+.PHONY: bit
+bit: $(bit)
+
 # Clean
 .PHONY: clean
 clean:
