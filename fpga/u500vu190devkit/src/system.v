@@ -98,6 +98,10 @@ U500VU190DevKitTop top
   .io_xilinxvu190xdma_c0_ddr4_ck_c(m0_ddr4_ck_c),
   .io_xilinxvu190xdma_c0_ddr4_reset_n(m0_ddr4_reset_n),
   .io_xilinxvu190xdma_c0_ddr4_par(m0_ddr4_parity),
+  .io_xilinxvu190xdma_pcie_7x_mgt_rtl_txp(pcie_7x_mgt_rtl_txp),
+  .io_xilinxvu190xdma_pcie_7x_mgt_rtl_txn(pcie_7x_mgt_rtl_txn),
+  .io_xilinxvu190xdma_pcie_7x_mgt_rtl_rxp(pcie_7x_mgt_rtl_rxp),
+  .io_xilinxvu190xdma_pcie_7x_mgt_rtl_rxn(pcie_7x_mgt_rtl_rxn),
   //Clock + Reset
   .io_pcie_refclk_p(pcie_sys_clkp),
   .io_pcie_refclk_n(pcie_sys_clkn),
