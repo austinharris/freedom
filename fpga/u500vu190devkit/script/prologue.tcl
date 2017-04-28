@@ -74,17 +74,10 @@ set_property target_simulator VCS [current_project]
 
 set obj [get_filesets sim_1]
 add_files -norecurse -fileset $obj [glob -directory $srcdir {*.v}]
-set_property "runtime" "" $obj
-set_property "top" "tb" $obj
-set_property -name {vcs.compile.vlogan.more_options} -value "+define+RANDOMIZE_REG_INIT -debug_access+all -sverilog -P ${::env(VERDI_HOME)}/share/PLI/VCS/linux64/novas.tab ${::env(VERDI_HOME)}/share/PLI/VCS/linux64/pli.a" -objects $obj
-set_property -name {vcs.elaborate.vcs.more_options} -value "-debug_access+all -P ${::env(VERDI_HOME)}/share/PLI/VCS/linux64/novas.tab ${::env(VERDI_HOME)}/share/PLI/VCS/linux64/pli.a" -objects $obj
 
-set_property "vcs.simulate.log_all_signals" "1" $obj
-set_property "vcs.simulate.runtime" "10000ns" $obj
-
-set simlibdir [file join $wrkdir {U500VU190DevKit.cache/compile_simlib}]
-#set vcsdir [file join $::env(VCS_HOME) /bin]
-#compile_simlib -language all -dir $simlibdir -simulator vcs_mx -simulator_exec_path $::env(VCS_HOME)/bin -library all -family  all
+set simlibdir [file join [pwd] {.cache/compile_simlib}]
+set vcsdir [file join $::env(VCS_HOME) /bin]
+compile_simlib -language all -dir $simlibdir -simulator vcs_mx -simulator_exec_path $::env(VCS_HOME)/bin -library all -family  all
 
 if {[get_filesets -quiet constrs_1] eq ""} {
   create_fileset -constrset constrs_1

@@ -86,11 +86,11 @@ class U500VU190DevKitTop(implicit val p: Parameters) extends Module {
   val host_done           = Wire(Bool())
   val host_done_reg       = Reg(Bool())
 
-  when(host_done) {
-    host_done_reg := !host_done_reg
-  }
-  .elsewhen(!init_calib_complete) {
+  when(!init_calib_complete) {
     host_done_reg := Bool(false)
+  }
+  .elsewhen(host_done) {
+    host_done_reg := !host_done_reg
   }
 
   do_reset             := !host_done_reg || !init_calib_complete

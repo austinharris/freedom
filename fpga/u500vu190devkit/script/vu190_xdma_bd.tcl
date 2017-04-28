@@ -20,7 +20,7 @@ set script_folder [_tcl::get_script_folder]
 ################################################################
 # Check if script is running in correct Vivado version.
 ################################################################
-set scripts_vivado_version 2016.4
+set scripts_vivado_version 2017.1
 set current_vivado_version [version -short]
 
 if { [string first $scripts_vivado_version $current_vivado_version] == -1 } {
@@ -268,20 +268,18 @@ CONFIG.S01_HAS_DATA_FIFO {2} \
  ] $axi_mem_intercon
 
   # Create instance: ddr4_0, and set properties
-  set ddr4_0 [ create_bd_cell -type ip -vlnv xilinx.com:ip:ddr4:2.1 ddr4_0 ]
+  set ddr4_0 [ create_bd_cell -type ip -vlnv xilinx.com:ip:ddr4:2.2 ddr4_0 ]
   set_property -dict [ list \
 CONFIG.ADDN_UI_CLKOUT1_FREQ_HZ {None} \
 CONFIG.C0.CKE_WIDTH {2} \
 CONFIG.C0.CS_WIDTH {2} \
 CONFIG.C0.DDR4_AxiAddressWidth {35} \
 CONFIG.C0.DDR4_AxiDataWidth {64} \
-CONFIG.C0.DDR4_CLKOUT0_DIVIDE {7} \
 CONFIG.C0.DDR4_CasLatency {11} \
 CONFIG.C0.DDR4_CasWriteLatency {11} \
 CONFIG.C0.DDR4_CustomParts {../../../../../../script/MTA36ASF4G72PZ-2G1.csv} \
 CONFIG.C0.DDR4_DataMask {NONE} \
 CONFIG.C0.DDR4_DataWidth {72} \
-CONFIG.C0.DDR4_Ecc {true} \
 CONFIG.C0.DDR4_InputClockPeriod {10000} \
 CONFIG.C0.DDR4_MemoryPart {MTA36ASF4G72PZ-2G3} \
 CONFIG.C0.DDR4_MemoryType {RDIMMs} \
@@ -301,7 +299,7 @@ CONFIG.C_SIZE {1} \
  ] $util_vector_logic_0
 
   # Create instance: xdma_0, and set properties
-  set xdma_0 [ create_bd_cell -type ip -vlnv xilinx.com:ip:xdma:3.0 xdma_0 ]
+  set xdma_0 [ create_bd_cell -type ip -vlnv xilinx.com:ip:xdma:3.1 xdma_0 ]
   set_property -dict [ list \
 CONFIG.INS_LOSS_NYQ {5} \
 CONFIG.axi_data_width {64_bit} \
@@ -365,7 +363,7 @@ CONFIG.xdma_wnum_chnl {2} \
 
   # Exclude Address Segments
   #create_bd_addr_seg -range 0x00002000 -offset 0x00000000 [get_bd_addr_spaces c0_ddr4_s_axi] [get_bd_addr_segs axi_bram_ctrl_1/S_AXI/Mem0] SEG_axi_bram_ctrl_1_Mem0
-  exclude_bd_addr_seg [get_bd_addr_segs c0_ddr4_s_axi/SEG_axi_bram_ctrl_1_Mem0]
+  # exclude_bd_addr_seg [get_bd_addr_segs c0_ddr4_s_axi/SEG_axi_bram_ctrl_1_Mem0]
 
   # Restore current instance
   current_bd_instance $oldCurInst

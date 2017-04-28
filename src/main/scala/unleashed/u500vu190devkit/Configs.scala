@@ -21,8 +21,8 @@ class WithU500VU190DevKitPeripheryParams extends Config((site, here, up) => {
 })
 
 class WithBigExtMem extends Config((site, here, up) => {
-  case PAddrBits => 34
-  case ExtMem => MasterConfig(base=0x80000000L, size=0x380000000L, beatBytes=8, idBits=4)
+  case PAddrBits => 35
+  case ExtMem => MasterConfig(base=0x80000000L, size=0x780000000L, beatBytes=8, idBits=4)
 })
 
 

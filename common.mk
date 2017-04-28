@@ -12,7 +12,6 @@
 # - EXTRA_FPGA_VSRCS
 
 EXTRA_FPGA_VSRCS ?=
-PATCHVERILOG ?= ""
 
 base_dir := $(patsubst %/,%,$(dir $(abspath $(lastword $(MAKEFILE_LIST)))))
 rocketchip_dir := $(base_dir)/rocket-chip
@@ -20,7 +19,7 @@ SBT ?= java -jar $(rocketchip_dir)/sbt-launch.jar
 
 # Build firrtl.jar and put it where chisel3 can find it.
 FIRRTL_JAR ?= $(rocketchip_dir)/firrtl/utils/bin/firrtl.jar
-FIRRTL ?= java -Xmx2G -Xss8M -XX:MaxPermSize=256M -cp $(FIRRTL_JAR) firrtl.Driver
+FIRRTL ?= java -Xmx16G -Xss8M -XX:MaxPermSize=256M -cp $(FIRRTL_JAR) firrtl.Driver
 
 $(FIRRTL_JAR): $(shell find $(rocketchip_dir)/firrtl/src/main/scala -iname "*.scala")
 	$(MAKE) -C $(rocketchip_dir)/firrtl SBT="$(SBT)" root_dir=$(rocketchip_dir)/firrtl build-scala
@@ -41,10 +40,6 @@ firrtl: $(firrtl)
 verilog := $(BUILD_DIR)/$(CONFIG_PROJECT).$(CONFIG).v
 $(verilog): $(firrtl) $(FIRRTL_JAR)
 	$(FIRRTL) -i $(firrtl) -o $@ -X verilog
-ifneq ($(PATCHVERILOG),"")
-	$(PATCHVERILOG)
-endif
-
 
 .PHONY: verilog
 verilog: $(verilog)

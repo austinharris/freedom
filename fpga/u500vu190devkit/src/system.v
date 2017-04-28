@@ -84,9 +84,9 @@ U500VU190DevKitTop top
   .io_gpio_pins_2_o_ds(),
   .io_gpio_pins_3_o_ds(),
   //MIG
-  .io_xilinxvu190xdma__inout_c0_ddr4_dq(m0_ddr4_dq),
-  .io_xilinxvu190xdma__inout_c0_ddr4_dqs_t(m0_ddr4_dqs_t),
-  .io_xilinxvu190xdma__inout_c0_ddr4_dqs_c(m0_ddr4_dqs_c),
+  .io_xilinxvu190xdma_c0_ddr4_dq(m0_ddr4_dq),
+  .io_xilinxvu190xdma_c0_ddr4_dqs_t(m0_ddr4_dqs_t),
+  .io_xilinxvu190xdma_c0_ddr4_dqs_c(m0_ddr4_dqs_c),
   .io_xilinxvu190xdma_c0_ddr4_act_n(m0_ddr4_act_n),
   .io_xilinxvu190xdma_c0_ddr4_adr(m0_ddr4_adr),
   .io_xilinxvu190xdma_c0_ddr4_ba(m0_ddr4_ba),

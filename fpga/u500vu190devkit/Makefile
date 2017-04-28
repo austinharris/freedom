@@ -13,4 +13,4 @@ bit: $(bit)
 
 .PHONY: clean
 clean::
-	rm -rf -- .Xil .ip_user_files *.os obj src/generated usage_statistics_webtalk.xml usage_statistics_webtalk.html *.log .srcs
+	rm -rf -- .Xil .ip_user_files *.os obj src/generated usage_statistics_webtalk.xml usage_statistics_webtalk.html *.log .srcs .cache .cxl.ip synopsys_sim.setup compile_simlib.log
