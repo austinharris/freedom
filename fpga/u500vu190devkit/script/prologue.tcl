@@ -74,6 +74,8 @@ set_property target_simulator VCS [current_project]
 
 set obj [get_filesets sim_1]
 add_files -norecurse -fileset $obj [glob -directory $srcdir {*.v}]
+set_property "runtime" "" $obj
+set_property "top" "tb" $obj
 
 set simlibdir [file join [pwd] {.cache/compile_simlib}]
 set vcsdir [file join $::env(VCS_HOME) /bin]
