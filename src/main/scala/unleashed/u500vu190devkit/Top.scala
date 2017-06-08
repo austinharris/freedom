@@ -22,8 +22,10 @@ import sifive.blocks.devices.spi._
 import sifive.blocks.devices.uart._
 import sifive.blocks.util.ResetCatchAndSync
 
+
 class U500VU190DevKitSystem(implicit p: Parameters) extends BaseTop
     with PeripheryBootROM
+    with PeripheryDMI
     with PeripheryCounter
     with HasPeripheryUART
     with HasPeripheryGPIO
@@ -35,6 +37,7 @@ class U500VU190DevKitSystem(implicit p: Parameters) extends BaseTop
 
 class U500VU190DevKitSystemBundle[+L <: U500VU190DevKitSystem](_outer: L) extends BaseTopBundle(_outer)
     with PeripheryBootROMBundle
+    with PeripheryDMIBundle
     with PeripheryCounterBundle
     with HasPeripheryUARTBundle
     with HasPeripheryGPIOBundle
@@ -44,6 +47,7 @@ class U500VU190DevKitSystemBundle[+L <: U500VU190DevKitSystem](_outer: L) extend
 
 class U500VU190DevKitSystemModule[+L <: U500VU190DevKitSystem, +B <: U500VU190DevKitSystemBundle[L]](_outer: L, _io: () => B) extends BaseTopModule(_outer, _io)
     with PeripheryBootROMModule
+    with PeripheryDMIModule
     with PeripheryCounterModule
     with HasPeripheryUARTModule
     with HasPeripheryGPIOModule
@@ -85,6 +89,7 @@ class U500VU190DevKitTop(implicit val p: Parameters) extends Module {
   val top_reset           = Wire(Bool())
   val host_done           = Wire(Bool())
   val host_done_reg       = Reg(Bool())
+  val user_lnk_up         = Wire(Bool())
 
   when(!init_calib_complete) {
     host_done_reg := Bool(false)
@@ -93,17 +98,16 @@ class U500VU190DevKitTop(implicit val p: Parameters) extends Module {
     host_done_reg := !host_done_reg
   }
 
-  do_reset             := !host_done_reg || !init_calib_complete
+  do_reset             := !host_done_reg || !init_calib_complete// || !user_lnk_up
 
-  top_clock := sys.io.xilinxvu190xdma.s01_aclk
+  top_clock := sys.io.xilinxvu190xdma.div_clk
   host_done := sys.io.xilinxvu190xdma.host_done
-
-  sys.io.xilinxvu190xdma.safe_aresetn := top_reset
-
-  top_reset            := do_reset
 
   sys.clock := top_clock
   sys.reset := top_reset
+
+  top_reset := do_reset
+
 
   // ------------------------------------------------------------
   // UART
@@ -125,8 +129,15 @@ class U500VU190DevKitTop(implicit val p: Parameters) extends Module {
   sys.io.xilinxvu190xdma.pcie_sys_clk_clk_n := io.pcie_refclk_n
   sys.io.xilinxvu190xdma.pcie_sys_clk_clk_p := io.pcie_refclk_p
   init_calib_complete := sys.io.xilinxvu190xdma.c0_init_calib_complete
+  user_lnk_up := sys.io.xilinxvu190xdma.user_lnk_up
 
   io.xilinxvu190xdma <> sys.io.xilinxvu190xdma
+
+  // Debug
+  // ------------------------------------------------------------
+  // Tie off
+  sys.io.debug.dmiReset := true.B
+
 
   // ------------------------------------------------------------
   // Misc outputs used in system.v

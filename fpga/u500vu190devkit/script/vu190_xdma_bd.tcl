@@ -160,7 +160,7 @@ CONFIG.ADDR_WIDTH {35} \
 CONFIG.ARUSER_WIDTH {0} \
 CONFIG.AWUSER_WIDTH {0} \
 CONFIG.BUSER_WIDTH {0} \
-CONFIG.DATA_WIDTH {64} \
+CONFIG.DATA_WIDTH {256} \
 CONFIG.HAS_BRESP {1} \
 CONFIG.HAS_BURST {1} \
 CONFIG.HAS_CACHE {1} \
@@ -183,6 +183,8 @@ CONFIG.RUSER_WIDTH {0} \
 CONFIG.SUPPORTS_NARROW_BURST {1} \
 CONFIG.WUSER_BITS_PER_BYTE {0} \
 CONFIG.WUSER_WIDTH {0} \
+CONFIG.ASSOCIATED_BUSIF {get_bd_ports /div_clk} \
+CONFIG.FREQ_HZ {61000000} \
  ] $c0_ddr4_s_axi
   set c0_ddr4_s_axi_ctrl [ create_bd_intf_port -mode Slave -vlnv xilinx.com:interface:aximm_rtl:1.0 c0_ddr4_s_axi_ctrl ]
   set_property -dict [ list \
@@ -226,6 +228,10 @@ CONFIG.FREQ_HZ {100000000} \
 CONFIG.ASSOCIATED_BUSIF {c0_ddr4_s_axi_ctrl} \
  ] $c0_ddr4_ui_clk
   set c0_init_calib_complete [ create_bd_port -dir O c0_init_calib_complete ]
+  set div_clk [ create_bd_port -dir O -type clk div_clk ]
+  set_property -dict [ list \
+CONFIG.FREQ_HZ {61000000} \
+ ] $div_clk
   set host_done [ create_bd_port -dir O -from 0 -to 0 host_done ]
   set pcie_refclk [ create_bd_port -dir I -type clk pcie_refclk ]
   set_property -dict [ list \
@@ -241,18 +247,19 @@ CONFIG.POLARITY {ACTIVE_LOW} \
  ] $pcie_sys_reset_l
   set s01_aclk [ create_bd_port -dir O -type clk s01_aclk ]
   set_property -dict [ list \
-CONFIG.ASSOCIATED_BUSIF {c0_ddr4_s_axi} \
+CONFIG.ASSOCIATED_BUSIF {} \
  ] $s01_aclk
   set s01_aresetn [ create_bd_port -dir O s01_aresetn ]
   set sys_reset [ create_bd_port -dir I -type rst sys_reset ]
   set_property -dict [ list \
 CONFIG.POLARITY {ACTIVE_HIGH} \
  ] $sys_reset
+  set user_lnk_up [ create_bd_port -dir O user_lnk_up ]
 
   # Create instance: axi_bram_ctrl_1, and set properties
   set axi_bram_ctrl_1 [ create_bd_cell -type ip -vlnv xilinx.com:ip:axi_bram_ctrl:4.0 axi_bram_ctrl_1 ]
   set_property -dict [ list \
-CONFIG.DATA_WIDTH {64} \
+CONFIG.DATA_WIDTH {256} \
 CONFIG.ECC_TYPE {0} \
 CONFIG.SINGLE_PORT_BRAM {1} \
  ] $axi_bram_ctrl_1
@@ -262,22 +269,24 @@ CONFIG.SINGLE_PORT_BRAM {1} \
   set_property -dict [ list \
 CONFIG.NUM_MI {2} \
 CONFIG.NUM_SI {2} \
-CONFIG.STRATEGY {2} \
 CONFIG.S00_HAS_DATA_FIFO {2} \
 CONFIG.S01_HAS_DATA_FIFO {2} \
+CONFIG.STRATEGY {2} \
  ] $axi_mem_intercon
 
   # Create instance: ddr4_0, and set properties
+
+  set parts_file [file join [pwd]/script/MTA36ASF4G72PZ-2G1.csv]
   set ddr4_0 [ create_bd_cell -type ip -vlnv xilinx.com:ip:ddr4:2.2 ddr4_0 ]
   set_property -dict [ list \
-CONFIG.ADDN_UI_CLKOUT1_FREQ_HZ {None} \
+CONFIG.ADDN_UI_CLKOUT1_FREQ_HZ {61} \
 CONFIG.C0.CKE_WIDTH {2} \
 CONFIG.C0.CS_WIDTH {2} \
 CONFIG.C0.DDR4_AxiAddressWidth {35} \
-CONFIG.C0.DDR4_AxiDataWidth {64} \
+CONFIG.C0.DDR4_AxiDataWidth {256} \
 CONFIG.C0.DDR4_CasLatency {11} \
 CONFIG.C0.DDR4_CasWriteLatency {11} \
-CONFIG.C0.DDR4_CustomParts {../../../../../../script/MTA36ASF4G72PZ-2G1.csv} \
+CONFIG.C0.DDR4_CustomParts $parts_file \
 CONFIG.C0.DDR4_DataMask {NONE} \
 CONFIG.C0.DDR4_DataWidth {72} \
 CONFIG.C0.DDR4_InputClockPeriod {10000} \
@@ -292,6 +301,9 @@ CONFIG.C0.ODT_WIDTH {2} \
   # Create instance: proc_sys_reset_0, and set properties
   set proc_sys_reset_0 [ create_bd_cell -type ip -vlnv xilinx.com:ip:proc_sys_reset:5.0 proc_sys_reset_0 ]
 
+  # Create instance: proc_sys_reset_1, and set properties
+  set proc_sys_reset_1 [ create_bd_cell -type ip -vlnv xilinx.com:ip:proc_sys_reset:5.0 proc_sys_reset_1 ]
+
   # Create instance: util_vector_logic_0, and set properties
   set util_vector_logic_0 [ create_bd_cell -type ip -vlnv xilinx.com:ip:util_vector_logic:2.0 util_vector_logic_0 ]
   set_property -dict [ list \
@@ -302,8 +314,8 @@ CONFIG.C_SIZE {1} \
   set xdma_0 [ create_bd_cell -type ip -vlnv xilinx.com:ip:xdma:3.1 xdma_0 ]
   set_property -dict [ list \
 CONFIG.INS_LOSS_NYQ {5} \
-CONFIG.axi_data_width {64_bit} \
-CONFIG.axisten_freq {62.5} \
+CONFIG.axi_data_width {256_bit} \
+CONFIG.axisten_freq {125} \
 CONFIG.cfg_mgmt_if {true} \
 CONFIG.coreclk_freq {250} \
 CONFIG.dedicate_perst {true} \
@@ -320,8 +332,8 @@ CONFIG.pf0_device_id {0054} \
 CONFIG.pf0_sub_class_interface_menu {Other_memory_controller} \
 CONFIG.pf0_subsystem_id {0054} \
 CONFIG.pf0_subsystem_vendor_id {12BA} \
-CONFIG.pl_link_cap_max_link_speed {2.5_GT/s} \
-CONFIG.pl_link_cap_max_link_width {X1} \
+CONFIG.pl_link_cap_max_link_speed {5.0_GT/s} \
+CONFIG.pl_link_cap_max_link_width {X8} \
 CONFIG.plltype {CPLL} \
 CONFIG.select_quad {GTH_Quad_225} \
 CONFIG.vendor_id {12BA} \
@@ -336,34 +348,33 @@ CONFIG.xdma_wnum_chnl {2} \
   connect_bd_intf_net -intf_net axi_mem_intercon_M00_AXI [get_bd_intf_pins axi_bram_ctrl_1/S_AXI] [get_bd_intf_pins axi_mem_intercon/M00_AXI]
   connect_bd_intf_net -intf_net axi_mem_intercon_M01_AXI [get_bd_intf_pins axi_mem_intercon/M01_AXI] [get_bd_intf_pins ddr4_0/C0_DDR4_S_AXI]
   connect_bd_intf_net -intf_net ddr4_0_C0_DDR4 [get_bd_intf_ports c0_ddr4] [get_bd_intf_pins ddr4_0/C0_DDR4]
-  connect_bd_intf_net -intf_net diff_clock_rtl_0_1 [get_bd_intf_ports c0_sys] [get_bd_intf_pins ddr4_0/C0_SYS_CLK]
+connect_bd_intf_net -intf_net diff_clock_rtl_0_1 [get_bd_intf_ports c0_sys] [get_bd_intf_pins ddr4_0/C0_SYS_CLK]
   connect_bd_intf_net -intf_net xdma_0_M_AXI [get_bd_intf_pins axi_mem_intercon/S00_AXI] [get_bd_intf_pins xdma_0/M_AXI]
   connect_bd_intf_net -intf_net xdma_0_pcie_mgt [get_bd_intf_ports pcie_7x_mgt_rtl] [get_bd_intf_pins xdma_0/pcie_mgt]
 
   # Create port connections
-  connect_bd_net -net S00_ACLK_1 [get_bd_ports s01_aclk] [get_bd_pins axi_bram_ctrl_1/s_axi_aclk] [get_bd_pins axi_mem_intercon/ACLK] [get_bd_pins axi_mem_intercon/M00_ACLK] [get_bd_pins axi_mem_intercon/S00_ACLK] [get_bd_pins axi_mem_intercon/S01_ACLK] [get_bd_pins xdma_0/axi_aclk]
+  connect_bd_net -net S00_ACLK_1 [get_bd_ports s01_aclk] [get_bd_pins axi_mem_intercon/ACLK] [get_bd_pins axi_mem_intercon/S00_ACLK] [get_bd_pins xdma_0/axi_aclk]
   connect_bd_net -net axi_bram_ctrl_1_s_axi_arready [get_bd_pins axi_bram_ctrl_1/s_axi_arready] [get_bd_pins axi_mem_intercon/M00_AXI_arready] [get_bd_pins util_vector_logic_0/Op1]
   connect_bd_net -net axi_mem_intercon_M00_AXI_arvalid [get_bd_pins axi_bram_ctrl_1/s_axi_arvalid] [get_bd_pins axi_mem_intercon/M00_AXI_arvalid] [get_bd_pins util_vector_logic_0/Op2]
+  connect_bd_net -net ddr4_0_addn_ui_clkout1 [get_bd_ports div_clk] [get_bd_pins axi_bram_ctrl_1/s_axi_aclk] [get_bd_pins axi_mem_intercon/M00_ACLK] [get_bd_pins axi_mem_intercon/S01_ACLK] [get_bd_pins ddr4_0/addn_ui_clkout1] [get_bd_pins proc_sys_reset_1/slowest_sync_clk]
   connect_bd_net -net ddr4_0_c0_ddr4_ui_clk [get_bd_ports c0_ddr4_ui_clk] [get_bd_pins axi_mem_intercon/M01_ACLK] [get_bd_pins ddr4_0/c0_ddr4_ui_clk] [get_bd_pins proc_sys_reset_0/slowest_sync_clk]
-  connect_bd_net -net ddr4_0_c0_ddr4_ui_clk_sync_rst [get_bd_pins ddr4_0/c0_ddr4_ui_clk_sync_rst] [get_bd_pins proc_sys_reset_0/ext_reset_in]
+  connect_bd_net -net ddr4_0_c0_ddr4_ui_clk_sync_rst [get_bd_pins ddr4_0/c0_ddr4_ui_clk_sync_rst] [get_bd_pins proc_sys_reset_0/ext_reset_in] [get_bd_pins proc_sys_reset_1/ext_reset_in]
   connect_bd_net -net ddr4_0_c0_init_calib_complete [get_bd_ports c0_init_calib_complete] [get_bd_pins ddr4_0/c0_init_calib_complete]
   connect_bd_net -net proc_sys_reset_0_peripheral_aresetn [get_bd_pins axi_mem_intercon/M01_ARESETN] [get_bd_pins ddr4_0/c0_ddr4_aresetn] [get_bd_pins proc_sys_reset_0/peripheral_aresetn]
+  connect_bd_net -net proc_sys_reset_1_peripheral_aresetn [get_bd_pins axi_bram_ctrl_1/s_axi_aresetn] [get_bd_pins axi_mem_intercon/M00_ARESETN] [get_bd_pins axi_mem_intercon/S01_ARESETN] [get_bd_pins proc_sys_reset_1/peripheral_aresetn]
   connect_bd_net -net reset_rtl_0_1 [get_bd_ports sys_reset] [get_bd_pins ddr4_0/sys_rst]
   connect_bd_net -net reset_rtl_1 [get_bd_ports pcie_sys_reset_l] [get_bd_pins xdma_0/sys_rst_n]
   connect_bd_net -net sys_clk_1 [get_bd_ports pcie_refclk] [get_bd_pins xdma_0/sys_clk]
   connect_bd_net -net sys_clk_gt_1 [get_bd_ports pcie_sys_clk_gt] [get_bd_pins xdma_0/sys_clk_gt]
   connect_bd_net -net util_vector_logic_0_Res [get_bd_ports host_done] [get_bd_pins util_vector_logic_0/Res]
-  connect_bd_net -net xdma_0_axi_aresetn [get_bd_ports s01_aresetn] [get_bd_pins axi_bram_ctrl_1/s_axi_aresetn] [get_bd_pins axi_mem_intercon/ARESETN] [get_bd_pins axi_mem_intercon/M00_ARESETN] [get_bd_pins axi_mem_intercon/S00_ARESETN] [get_bd_pins axi_mem_intercon/S01_ARESETN] [get_bd_pins xdma_0/axi_aresetn]
+  connect_bd_net -net xdma_0_axi_aresetn [get_bd_ports s01_aresetn] [get_bd_pins axi_mem_intercon/ARESETN] [get_bd_pins axi_mem_intercon/S00_ARESETN] [get_bd_pins xdma_0/axi_aresetn]
+  connect_bd_net -net xdma_0_user_lnk_up [get_bd_ports user_lnk_up] [get_bd_pins xdma_0/user_lnk_up]
 
   # Create address segments
   create_bd_addr_seg -range 0x00002000 -offset 0x000800000000 [get_bd_addr_spaces xdma_0/M_AXI] [get_bd_addr_segs axi_bram_ctrl_1/S_AXI/Mem0] SEG_axi_bram_ctrl_1_Mem0
   create_bd_addr_seg -range 0x000800000000 -offset 0x00000000 [get_bd_addr_spaces xdma_0/M_AXI] [get_bd_addr_segs ddr4_0/C0_DDR4_MEMORY_MAP/C0_DDR4_ADDRESS_BLOCK] SEG_ddr4_0_C0_DDR4_ADDRESS_BLOCK
   create_bd_addr_seg -range 0x000800000000 -offset 0x00000000 [get_bd_addr_spaces c0_ddr4_s_axi] [get_bd_addr_segs ddr4_0/C0_DDR4_MEMORY_MAP/C0_DDR4_ADDRESS_BLOCK] SEG_ddr4_0_C0_DDR4_ADDRESS_BLOCK
   create_bd_addr_seg -range 0x00100000 -offset 0x80000000 [get_bd_addr_spaces c0_ddr4_s_axi_ctrl] [get_bd_addr_segs ddr4_0/C0_DDR4_MEMORY_MAP_CTRL/C0_REG] SEG_ddr4_0_C0_REG
-
-  # Exclude Address Segments
-  #create_bd_addr_seg -range 0x00002000 -offset 0x00000000 [get_bd_addr_spaces c0_ddr4_s_axi] [get_bd_addr_segs axi_bram_ctrl_1/S_AXI/Mem0] SEG_axi_bram_ctrl_1_Mem0
-  # exclude_bd_addr_seg [get_bd_addr_segs c0_ddr4_s_axi/SEG_axi_bram_ctrl_1_Mem0]
 
   # Restore current instance
   current_bd_instance $oldCurInst

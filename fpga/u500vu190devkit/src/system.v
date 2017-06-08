@@ -15,7 +15,7 @@ module system
   output wire [1:0]  m0_ddr4_bg,
   output wire [1:0]  m0_ddr4_cke,
   output wire [1:0]  m0_ddr4_odt,
-  output wire [3:0]  m0_ddr4_cs_n,
+  output wire [1:0]  m0_ddr4_cs_n,
   output wire [0:0]  m0_ddr4_ck_t,
   output wire [0:0]  m0_ddr4_ck_c,
   output wire        m0_ddr4_reset_n,
@@ -31,14 +31,12 @@ module system
   input wire         uart_rtsn,
   output wire        uart_ctsn,
   //PCIe
-  output wire [0:0]  pcie_7x_mgt_rtl_txp,
-  output wire [0:0]  pcie_7x_mgt_rtl_txn,
-  input wire [0:0]   pcie_7x_mgt_rtl_rxp,
-  input wire [0:0]   pcie_7x_mgt_rtl_rxn,
+  output wire [7:0]  pcie_7x_mgt_rtl_txp,
+  output wire [7:0]  pcie_7x_mgt_rtl_txn,
+  input wire [7:0]   pcie_7x_mgt_rtl_rxp,
+  input wire [7:0]   pcie_7x_mgt_rtl_rxn,
   input wire         pcie_sys_clkp,
   input wire         pcie_sys_clkn,
-  input wire         pcie_sys_clk_1_p,
-  input wire         pcie_sys_clk_1_n,
   input wire         pcie_sys_reset_l,
  //MISC
   input wire         rd_prsnt_l_1,
@@ -51,11 +49,7 @@ module system
 );
 
 reg [1:0] uart_rx_sync;
-wire [3:0] sd_spi_dq_i;
-wire [3:0] sd_spi_dq_o;
-wire sd_spi_sck;
-wire sd_spi_cs;
-wire top_clock,top_reset;
+wire top_clock,top_reset,aclk;
 
 U500VU190DevKitTop top
 (
@@ -106,9 +100,9 @@ U500VU190DevKitTop top
   .io_pcie_refclk_p(pcie_sys_clkp),
   .io_pcie_refclk_n(pcie_sys_clkn),
   .io_pcie_sys_reset_l(pcie_sys_reset_l),
+  .io_sys_reset(~sys_rst_l),
   .io_ddr4_sys_clk_1_p(ddr4_sys_clk_1_p),
   .io_ddr4_sys_clk_1_n(ddr4_sys_clk_1_n),
-  .io_sys_reset(~sys_rst_l),
   .clock(top_clock),
   //Misc outputs for system.v
   .io_core_clock(top_clock),
@@ -116,7 +110,7 @@ U500VU190DevKitTop top
 );
 
   //UART
-  assign uart_ctsn =1'b0;  
+  assign uart_ctsn =1'b0;
   always @(posedge top_clock) begin
     if (top_reset) begin
       uart_rx_sync <= 2'b11;

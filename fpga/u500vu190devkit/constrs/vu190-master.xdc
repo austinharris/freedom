@@ -74,10 +74,8 @@ set_property PACKAGE_PIN AR26 [get_ports pcie_sys_reset_l]
 set_property IOSTANDARD LVCMOS12 [get_ports pcie_sys_reset_l]
 set_property PULLUP true [get_ports pcie_sys_reset_l]
 set_property PACKAGE_PIN AT10 [get_ports pcie_sys_clkn]
-set_property PACKAGE_PIN AH10 [get_ports pcie_sys_clk_1_n]
 
 create_clock -period 10.000 -name refclk_100 [get_ports pcie_sys_clkp]
-create_clock -period 10.000 -name refclk_100_1 [get_ports pcie_sys_clk_1_p]
 
 ##############################################
 ##########   DDR4 Pin Properties    ##########
