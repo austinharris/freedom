@@ -70,16 +70,12 @@ if {[get_filesets -quiet sim_1] eq ""} {
 # set obj [current_fileset -simset]
 # set_property TOP {tb} $obj
 
-set_property target_simulator VCS [current_project]
 
 set obj [get_filesets sim_1]
 add_files -norecurse -fileset $obj [glob -directory $srcdir {*.v}]
 set_property "runtime" "" $obj
 set_property "top" "tb" $obj
 
-set simlibdir [file join [pwd] {.cache/compile_simlib}]
-set vcsdir [file join $::env(VCS_HOME) /bin]
-compile_simlib -language all -dir $simlibdir -simulator vcs_mx -simulator_exec_path $::env(VCS_HOME)/bin -library all -family  all
 
 if {[get_filesets -quiet constrs_1] eq ""} {
   create_fileset -constrset constrs_1

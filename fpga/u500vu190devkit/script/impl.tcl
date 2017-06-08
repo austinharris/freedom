@@ -2,8 +2,6 @@ set_param {messaging.defaultLimit} 1000000
 
 synth_ip [get_ips vu190_xdma]
 
-export_simulation -lib_map_path $simlibdir -directory [pwd] -simulator vcs -force
-
 synth_design -top $top -flatten_hierarchy rebuilt
 write_checkpoint -force [file join $wrkdir post_synth]
 

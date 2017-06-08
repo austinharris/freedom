@@ -62,6 +62,14 @@ $(bit): $(verilog)
 .PHONY: bit
 bit: $(bit)
 
+# Build VCS simulation script
+vcs := $(FPGA_DIR)/vcs/tb.sh
+$(vcs): $(verilog)
+	VSRC_TOP=$(verilog) EXTRA_VSRCS="$(EXTRA_FPGA_VSRCS)" $(MAKE) -C $(FPGA_DIR) vcs
+
+.PHONY: vcs
+vcs: $(vcs)
+
 # Clean
 .PHONY: clean
 clean:
