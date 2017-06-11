@@ -12,7 +12,6 @@ import uncore.devices.{DMKey}
 // Don't use directly. Requires additional bootfile configuration
 class DefaultFreedomUConfig extends Config(
   new WithNBigCores(2) ++
-  new WithJtagDTM ++
   new BaseConfig
 )
 
