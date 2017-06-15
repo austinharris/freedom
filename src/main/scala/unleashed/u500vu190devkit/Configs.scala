@@ -17,7 +17,7 @@ class DefaultFreedomUConfig extends Config(
 
 class WithU500VU190DevKitPeripheryParams extends Config((site, here, up) => {
   case PeripheryUARTKey => List(UARTParams(address = BigInt(0x54000000L)))
-  case PeripheryGPIOKey => GPIOParams(address = BigInt(0x54002000L), width = 4)
+  case PeripheryGPIOKey => Seq(GPIOParams(address = BigInt(0x54002000L), width = 4))
 })
 
 class WithBigExtMem extends Config((site, here, up) => {
