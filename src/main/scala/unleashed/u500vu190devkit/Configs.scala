@@ -25,22 +25,12 @@ class WithBigExtMem extends Config((site, here, up) => {
   case ExtMem => MasterConfig(base=0x80000000L, size=0x780000000L, beatBytes=8, idBits=4)
 })
 
-class WithSlowMulDiv extends Config((site, here, up) => {
-  case RocketTilesKey => up(RocketTilesKey, site) map { r =>
-    r.copy(core = r.core.copy(mulDiv = Some(
-      MulDivParams(mulUnroll = 1, mulEarlyOut = false, divEarlyOut = false)
-  )))}
-})
-
-
 //----------------------------------------------------------------------------------
 // Freedom U500 VU190 Dev Kit
 
 class U500VU190DevKitConfig extends Config(
   new WithBootROMFile("./bootrom/u500vu190devkit.img") ++
-  new WithRTCPeriod(61) ++    //Default value of 100 generates 1 Mhz clock @ 100Mhz, then corrected in sbi_entry.c
-                              //Value 62 generates ~ 1Mhz clock @ 62.5Mhz
-  new WithSlowMulDiv ++
+  new WithRTCPeriod(100) ++    //Default value of 100 generates 1 Mhz clock @ 100Mhz, then corrected in sbi_entry.c
   new WithoutTLMonitors ++
   new WithEdgeDataBits(256) ++
   new WithoutFPU ++

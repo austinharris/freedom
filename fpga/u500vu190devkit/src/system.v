@@ -4,6 +4,7 @@
 
 module system
 (
+  input wire         clk_48_mhz,
   input wire         ddr4_sys_clk_1_p,
   input wire         ddr4_sys_clk_1_n,
   //active low reset
@@ -49,7 +50,13 @@ module system
 );
 
 reg [1:0] uart_rx_sync;
-wire top_clock,top_reset,aclk;
+wire   top_clock,top_reset;
+
+clockgen top_clockgen
+(
+  .clk_in1(clk_48_mhz),
+  .clk_out1(top_clock)
+);
 
 U500VU190DevKitTop top
 (
@@ -103,9 +110,9 @@ U500VU190DevKitTop top
   .io_sys_reset(~sys_rst_l),
   .io_ddr4_sys_clk_1_p(ddr4_sys_clk_1_p),
   .io_ddr4_sys_clk_1_n(ddr4_sys_clk_1_n),
+  .io_core_clk(top_clock),
   .clock(top_clock),
   //Misc outputs for system.v
-  .io_core_clock(top_clock),
   .io_core_reset(top_reset)
 );
 

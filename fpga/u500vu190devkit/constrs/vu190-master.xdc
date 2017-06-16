@@ -35,6 +35,10 @@ set_property ODT RTT_48 [get_ports ddr4_sys_clk_1_p]
 set_property IOSTANDARD LVCMOS18 [get_ports sys_rst_l]
 set_property PACKAGE_PIN AT23 [get_ports sys_rst_l]
 
+set_property IOSTANDARD LVCMOS18 [get_ports clk_48_mhz]
+set_property PACKAGE_PIN AV23 [get_ports clk_48_mhz]
+create_clock -period 20.833 -name refclk_48 [get_ports clk_48_mhz]
+
 ##############################################
 ##########      UART                ##########
 ##############################################

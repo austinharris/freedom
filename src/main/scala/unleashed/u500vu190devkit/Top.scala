@@ -52,12 +52,12 @@ class U500VU190DevKitIO(implicit p: Parameters) extends Bundle {
   val ddr4_sys_clk_1_p = Bool(INPUT)
   val pcie_refclk_p = Bool(INPUT)
   val pcie_refclk_n = Bool(INPUT)
+  val core_clk = Clock(INPUT)
   //Reset
   val sys_reset = Bool(INPUT)
   val pcie_sys_reset_l = Bool(INPUT)
   //Misc outputs used in system.v
   val core_reset = Bool(OUTPUT)
-  val core_clock = Clock(OUTPUT)
 }
 
 class U500VU190DevKitTop(implicit val p: Parameters) extends Module {
@@ -77,7 +77,6 @@ class U500VU190DevKitTop(implicit val p: Parameters) extends Module {
   val top_reset           = Wire(Bool())
   val host_done           = Wire(Bool())
   val host_done_reg       = Reg(Bool())
-  val user_lnk_up         = Wire(Bool())
 
   when(!init_calib_complete) {
     host_done_reg := Bool(false)
@@ -86,16 +85,13 @@ class U500VU190DevKitTop(implicit val p: Parameters) extends Module {
     host_done_reg := !host_done_reg
   }
 
-  do_reset             := !host_done_reg || !init_calib_complete// || !user_lnk_up
+  do_reset             := !host_done_reg || !init_calib_complete
 
-  top_clock := sys.xilinxvu190xdma.div_clk
-  host_done := sys.xilinxvu190xdma.host_done
+  top_clock := io.core_clk
+  top_reset := do_reset
 
   sys.clock := top_clock
   sys.reset := top_reset
-
-  top_reset := do_reset
-
 
   // ------------------------------------------------------------
   // UART
@@ -110,14 +106,15 @@ class U500VU190DevKitTop(implicit val p: Parameters) extends Module {
   // ------------------------------------------------------------
   // DMA
   // ------------------------------------------------------------
+  sys.xilinxvu190xdma.div_clk := top_clock
   sys.xilinxvu190xdma.sys_reset               := io.sys_reset
   sys.xilinxvu190xdma.pcie_sys_reset_l        := io.pcie_sys_reset_l
   sys.xilinxvu190xdma.c0_sys_clk_p            := io.ddr4_sys_clk_1_p
   sys.xilinxvu190xdma.c0_sys_clk_n            := io.ddr4_sys_clk_1_n
-  sys.xilinxvu190xdma.pcie_sys_clk_clk_n := io.pcie_refclk_n
-  sys.xilinxvu190xdma.pcie_sys_clk_clk_p := io.pcie_refclk_p
+  sys.xilinxvu190xdma.pcie_sys_clk_n := io.pcie_refclk_n
+  sys.xilinxvu190xdma.pcie_sys_clk_p := io.pcie_refclk_p
   init_calib_complete := sys.xilinxvu190xdma.c0_init_calib_complete
-  user_lnk_up := sys.xilinxvu190xdma.user_lnk_up
+  host_done := sys.xilinxvu190xdma.host_done
 
   io.xilinxvu190xdma <> sys.xilinxvu190xdma
 

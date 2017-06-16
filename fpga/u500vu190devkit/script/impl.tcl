@@ -8,12 +8,12 @@ write_checkpoint -force [file join $wrkdir post_synth]
 opt_design
 write_checkpoint -force [file join $wrkdir post_opt]
 
-place_design
+place_design -directive ExtraTimingOpt
 write_checkpoint -force [file join $wrkdir post_place]
 
-phys_opt_design
+phys_opt_design -directive Explore
 power_opt_design
-route_design
+route_design -directive Explore
 write_checkpoint -force [file join $wrkdir post_route]
 
 write_bitstream -force [file join $wrkdir "${top}.bit"]
