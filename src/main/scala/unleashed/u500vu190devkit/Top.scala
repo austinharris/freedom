@@ -106,7 +106,7 @@ class U500VU190DevKitTop(implicit val p: Parameters) extends Module {
   // ------------------------------------------------------------
   // DMA
   // ------------------------------------------------------------
-  sys.xilinxvu190xdma.div_clk := top_clock
+  sys.xilinxvu190xdma.core_clk := top_clock
   sys.xilinxvu190xdma.sys_reset               := io.sys_reset
   sys.xilinxvu190xdma.pcie_sys_reset_l        := io.pcie_sys_reset_l
   sys.xilinxvu190xdma.c0_sys_clk_p            := io.ddr4_sys_clk_1_p
@@ -127,6 +127,5 @@ class U500VU190DevKitTop(implicit val p: Parameters) extends Module {
   // ------------------------------------------------------------
   // Misc outputs used in system.v
   // ------------------------------------------------------------
-  io.core_clock := top_clock
   io.core_reset := top_reset
 }
