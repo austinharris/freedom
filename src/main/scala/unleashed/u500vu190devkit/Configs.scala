@@ -25,12 +25,13 @@ class WithBigExtMem extends Config((site, here, up) => {
   case ExtMem => MasterConfig(base=0x80000000L, size=0x780000000L, beatBytes=8, idBits=4)
 })
 
+
 //----------------------------------------------------------------------------------
 // Freedom U500 VU190 Dev Kit
 
 class U500VU190DevKitConfig extends Config(
   new WithBootROMFile("./bootrom/u500vu190devkit.img") ++
-  new WithRTCPeriod(100) ++    //Default value of 100 generates 1 Mhz clock @ 100Mhz, then corrected in sbi_entry.c
+  new WithRTCPeriod(144) ++    //Default value of 100 generates 1 Mhz clock @ 100Mhz, then corrected in sbi_entry.c
   new WithoutTLMonitors ++
   new WithEdgeDataBits(256) ++
   new WithoutFPU ++

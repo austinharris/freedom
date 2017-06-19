@@ -89,7 +89,8 @@ module tb(
                    .pcie_sys_clkp(pcie_sys_clk_p),
                    .pcie_sys_clkn(pcie_sys_clk_n),
                    .ddr4_sys_clk_1_p(ddr4_sys_clk_p),
-                   .ddr4_sys_clk_1_n(ddr4_sys_clk_n)
+                   .ddr4_sys_clk_1_n(ddr4_sys_clk_n),
+                   .clk_48_mhz(pcie_sys_clk_p)
                    );
 
    initial begin

@@ -161,7 +161,7 @@ CONFIG.ARUSER_WIDTH {0} \
 CONFIG.AWUSER_WIDTH {0} \
 CONFIG.BUSER_WIDTH {0} \
 CONFIG.DATA_WIDTH {256} \
-CONFIG.FREQ_HZ {100000000} \
+CONFIG.FREQ_HZ {144000000} \
 CONFIG.HAS_BRESP {1} \
 CONFIG.HAS_BURST {1} \
 CONFIG.HAS_CACHE {1} \
@@ -229,7 +229,7 @@ CONFIG.ASSOCIATED_BUSIF {c0_ddr4_s_axi_ctrl} \
   set c0_init_calib_complete [ create_bd_port -dir O c0_init_calib_complete ]
   set core_clk [ create_bd_port -dir I -type clk core_clk ]
   set_property -dict [ list \
-CONFIG.FREQ_HZ {100000000} \
+CONFIG.FREQ_HZ {144000000} \
  ] $core_clk
   set host_done [ create_bd_port -dir O -from 0 -to 0 host_done ]
   set pcie_refclk [ create_bd_port -dir I -type clk pcie_refclk ]
@@ -345,7 +345,7 @@ CONFIG.xdma_wnum_chnl {2} \
   connect_bd_intf_net -intf_net axi_mem_intercon_M00_AXI [get_bd_intf_pins axi_bram_ctrl_1/S_AXI] [get_bd_intf_pins axi_mem_intercon/M00_AXI]
   connect_bd_intf_net -intf_net axi_mem_intercon_M01_AXI [get_bd_intf_pins axi_mem_intercon/M01_AXI] [get_bd_intf_pins ddr4_0/C0_DDR4_S_AXI]
   connect_bd_intf_net -intf_net ddr4_0_C0_DDR4 [get_bd_intf_ports c0_ddr4] [get_bd_intf_pins ddr4_0/C0_DDR4]
-connect_bd_intf_net -intf_net diff_clock_rtl_0_1 [get_bd_intf_ports c0_sys] [get_bd_intf_pins ddr4_0/C0_SYS_CLK]
+  connect_bd_intf_net -intf_net diff_clock_rtl_0_1 [get_bd_intf_ports c0_sys] [get_bd_intf_pins ddr4_0/C0_SYS_CLK]
   connect_bd_intf_net -intf_net xdma_0_M_AXI [get_bd_intf_pins axi_mem_intercon/S00_AXI] [get_bd_intf_pins xdma_0/M_AXI]
   connect_bd_intf_net -intf_net xdma_0_pcie_mgt [get_bd_intf_ports pcie_7x_mgt_rtl] [get_bd_intf_pins xdma_0/pcie_mgt]
 

@@ -1,5 +1,3 @@
-// file: clk_wiz_0.v
-//
 // (c) Copyright 2008 - 2013 Xilinx, Inc. All rights reserved.
 //
 // This file contains confidential and proprietary information
@@ -55,12 +53,12 @@
 //  Output     Output      Phase    Duty Cycle   Pk-to-Pk     Phase
 //   Clock     Freq (MHz)  (degrees)    (%)     Jitter (ps)  Error (ps)
 //----------------------------------------------------------------------------
-// clk_out1___100.000______0.000______50.0______281.760____432.554
+// clk_out1___144.000______0.000______50.0______148.043____171.539
 //
 //----------------------------------------------------------------------------
 // Input Clock   Freq (MHz)    Input Jitter (UI)
 //----------------------------------------------------------------------------
-// __primary______________48____________0.010
+// __primary______________48______________100
 
 `timescale 1ps/1ps
 
@@ -126,11 +124,11 @@ wire clk_in2_clk_wiz_0;
     .CLKOUT4_CASCADE      ("FALSE"),
     .COMPENSATION         ("AUTO"),
     .STARTUP_WAIT         ("FALSE"),
-    .DIVCLK_DIVIDE        (3),
-    .CLKFBOUT_MULT_F      (62.500),
+    .DIVCLK_DIVIDE        (1),
+    .CLKFBOUT_MULT_F      (21.000),
     .CLKFBOUT_PHASE       (0.000),
     .CLKFBOUT_USE_FINE_PS ("FALSE"),
-    .CLKOUT0_DIVIDE_F     (10.000),
+    .CLKOUT0_DIVIDE_F     (7.000),
     .CLKOUT0_PHASE        (0.000),
     .CLKOUT0_DUTY_CYCLE   (0.500),
     .CLKOUT0_USE_FINE_PS  ("FALSE"),
