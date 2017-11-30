@@ -161,7 +161,7 @@ CONFIG.ARUSER_WIDTH {0} \
 CONFIG.AWUSER_WIDTH {0} \
 CONFIG.BUSER_WIDTH {0} \
 CONFIG.DATA_WIDTH {256} \
-CONFIG.FREQ_HZ {144000000} \
+CONFIG.FREQ_HZ {100000000} \
 CONFIG.HAS_BRESP {1} \
 CONFIG.HAS_BURST {1} \
 CONFIG.HAS_CACHE {1} \
@@ -229,7 +229,7 @@ CONFIG.ASSOCIATED_BUSIF {c0_ddr4_s_axi_ctrl} \
   set c0_init_calib_complete [ create_bd_port -dir O c0_init_calib_complete ]
   set core_clk [ create_bd_port -dir I -type clk core_clk ]
   set_property -dict [ list \
-CONFIG.FREQ_HZ {144000000} \
+CONFIG.FREQ_HZ {100000000} \
  ] $core_clk
   set host_done [ create_bd_port -dir O -from 0 -to 0 host_done ]
   set pcie_refclk [ create_bd_port -dir I -type clk pcie_refclk ]

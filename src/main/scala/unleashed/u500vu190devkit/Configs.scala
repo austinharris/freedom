@@ -3,7 +3,7 @@ package sifive.freedom.unleashed.u500vu190devkit
 
 import config._
 import coreplex.{WithL1ICacheWays,WithL1DCacheWays,WithL1DCacheSets,WithL1ICacheSets,WithoutFPU,WithBootROMFile,WithNBigCores,WithoutMulDiv,RocketTilesKey}
-import rocketchip.{BaseConfig,WithRTCPeriod,WithJtagDTM,ExtMem,MasterConfig,WithEdgeDataBits,WithoutTLMonitors}
+import rocketchip.{BaseConfig,WithRTCPeriod,WithJtagDTM,ExtMem,MasterConfig,WithEdgeDataBits,WithoutTLMonitors,WithExtMemSize}
 import rocket.{PAddrBits,MulDivParams}
 import sifive.blocks.devices.uart.{UARTParams,PeripheryUARTKey}
 import sifive.blocks.devices.gpio.{GPIOParams,PeripheryGPIOKey}
@@ -25,15 +25,22 @@ class WithBigExtMem extends Config((site, here, up) => {
   case ExtMem => MasterConfig(base=0x80000000L, size=0x780000000L, beatBytes=8, idBits=4)
 })
 
+class WithNPerfCounters(nCounters: Int) extends Config ((site, here, up) => {
+  case RocketTilesKey => up(RocketTilesKey, site) map { r =>
+    r.copy(core = r.core.copy(nPerfCounters = nCounters))
+  }
+})
 
 //----------------------------------------------------------------------------------
 // Freedom U500 VU190 Dev Kit
 
 class U500VU190DevKitConfig extends Config(
   new WithBootROMFile("./bootrom/u500vu190devkit.img") ++
-  new WithRTCPeriod(144) ++    //Default value of 100 generates 1 Mhz clock @ 100Mhz, then corrected in sbi_entry.c
+  new WithRTCPeriod(100) ++    //Default value of 100 generates 1 Mhz clock @ 100Mhz, then corrected in sbi_entry.c
   new WithoutTLMonitors ++
   new WithEdgeDataBits(256) ++
+  new WithExtMemSize(0x80000000L) ++
+  new WithNPerfCounters(29) ++
   new WithoutFPU ++
   new WithU500VU190DevKitPeripheryParams ++
   new WithL1DCacheWays(8) ++
