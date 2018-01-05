@@ -87,6 +87,8 @@ $(bit): $(romgen) $(f)
 		-ip-vivado-tcls "$(shell find '$(BUILD_DIR)' -name '*.vivado.tcl')" \
 		-board "$(BOARD)"
 
+.phony: bit
+bit: $(bit)
 
 # Build .mcs
 mcs := $(BUILD_DIR)/obj/$(MODEL).mcs
@@ -103,6 +105,16 @@ $(prjx): $(verilog)
 
 .PHONY: prjx
 prjx: $(prjx)
+
+vcs := $(BUILD_DIR)/vcs/tb.sh
+$(vcs): $(fpga_common_script_dir)/export_sim.tcl  $(fpga_common_script_dir)/init.tcl
+	#VSRC_TOP=$(VSRC_TOP) EXTRA_VSRCS="$(EXTRA_VSRCS)" $(VIVADO) $(VIVADOFLAGS) -source script/init.tcl -source script/export_sim.tcl
+	cd $(BUILD_DIR); vivado -nojournal -mode batch -source $(fpga_common_script_dir)/prologue.tcl $(fpga_common_script_dir)/init.tcl -source $(fpga_common_script_dir)/export_sim.tcl
+	sed -i -e 's/vlogan_opts="-full64"/vlogan_opts="-kdb -full64 +define+RANDOMIZE_REG_INIT"/' $(vcs)
+	sed -i -e 's/vcs_elab_opts="-full64 -debug_pp/vcs_elab_opts="-kdb -lca -full64 -debug_access/' $(vcs)
+
+.PHONY: vcs
+vcs: $(vcs)
 
 # Clean
 .PHONY: clean
