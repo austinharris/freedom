@@ -2,7 +2,7 @@
 package sifive.freedom.unleashed.u500vu190devkit
 
 import freechips.rocketchip.config._
-import freechips.rocketchip.coreplex._
+import freechips.rocketchip.subsystem._
 import freechips.rocketchip.devices.debug._
 import freechips.rocketchip.devices.tilelink._
 import freechips.rocketchip.diplomacy._
@@ -43,6 +43,6 @@ class U500VU190DevKitConfig extends Config(
     case PeripheryBusKey => up(PeripheryBusKey, site).copy(frequency = 100000000)
     case MemoryXilinxDDRKey => XilinxVU190XDMAParams(address = Seq(AddressSet(0x80000000L, 0x80000000L-1)))
     case DTSTimebase => BigInt(1000000)
-    case ExtMem => up(ExtMem).copy(size = 0x80000000L)
+    case ExtMem => up(ExtMem).map(_.copy(size = 0x80000000L))
   })
 )

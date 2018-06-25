@@ -4,7 +4,7 @@ package sifive.freedom.unleashed.u500vu190devkit
 import Chisel._
 
 import freechips.rocketchip.config._
-import freechips.rocketchip.coreplex._
+import freechips.rocketchip.subsystem._
 import freechips.rocketchip.devices.debug._
 import freechips.rocketchip.devices.tilelink._
 import freechips.rocketchip.diplomacy._
@@ -20,7 +20,7 @@ import sifive.fpgashells.devices.xilinx.xilinxvu190xdma._
 // U500VU190DevKitSystem
 //-------------------------------------------------------------------------
 
-class U500VU190DevKitSystem(implicit p: Parameters) extends RocketCoreplex
+class U500VU190DevKitSystem(implicit p: Parameters) extends RocketSubsystem
     with HasPeripheryMaskROMSlave
     with HasPeripheryDebug
     with HasSystemErrorSlave
@@ -30,7 +30,7 @@ class U500VU190DevKitSystem(implicit p: Parameters) extends RocketCoreplex
 }
 
 class U500VU190DevKitSystemModule[+L <: U500VU190DevKitSystem](_outer: L)
-  extends RocketCoreplexModule(_outer)
+  extends RocketSubsystemModuleImp(_outer)
     with HasRTCModuleImp
     with HasPeripheryDebugModuleImp
     with HasPeripheryUARTModuleImp

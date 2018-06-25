@@ -1,14 +1,12 @@
 # RISCV environment variable must be set
 
-#CC=$(RISCV)/bin/riscv64-unknown-linux-gnu-gcc
-#OBJCOPY=$(RISCV)/bin/riscv64-unknown-linux-gnu-objcopy
-CC=riscv64-unknown-linux-gnu-gcc
-OBJCOPY=riscv64-unknown-linux-gnu-objcopy
+CC=$(RISCV)/bin/riscv64-unknown-linux-gnu-gcc
+OBJCOPY=$(RISCV)/bin/riscv64-unknown-linux-gnu-objcopy
 CFLAGS=-std=gnu11 -Wall -I. -nostartfiles -fno-common -g
 LFLAGS=-static -nostdlib
 
-dtb := $(BUILD_DIR)/$(CONFIG).dtb
-$(dtb): $(BUILD_DIR)/$(CONFIG).dts
+dtb := $(BUILD_DIR)/$(CONFIG_PROJECT).$(CONFIG).dtb
+$(dtb): $(BUILD_DIR)/$(CONFIG_PROJECT).$(CONFIG).dts
 	dtc -I dts -O dtb -o $@ $<
 
 .PHONY: dtb
