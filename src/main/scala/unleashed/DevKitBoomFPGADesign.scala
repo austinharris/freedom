@@ -5,6 +5,8 @@ package sifive.freedom.unleashed
 import Chisel._
 import chisel3.experimental.{withClockAndReset}
 
+import boom.system.{BoomSubsystem, BoomSubsystemModule}
+
 import freechips.rocketchip.config._
 import freechips.rocketchip.subsystem._
 import freechips.rocketchip.devices.debug._
@@ -25,13 +27,7 @@ import sifive.blocks.devices.pinctrl.{BasePin}
 import sifive.fpgashells.shell._
 import sifive.fpgashells.clocks._
 
-object PinGen {
-  def apply(): BasePin = {
-    new BasePin()
-  }
-}
-
-class DevKitWrapper()(implicit p: Parameters) extends LazyModule
+class DevKitBoomWrapper()(implicit p: Parameters) extends LazyModule
 {
   val sysClock  = p(ClockInputOverlayKey).head(ClockInputOverlayParams())
   val corePLL   = p(PLLFactoryKey)()
@@ -43,7 +39,7 @@ class DevKitWrapper()(implicit p: Parameters) extends LazyModule
   // removing the debug trait is invasive, so we hook it up externally for now
   val jt = p(JTAGDebugOverlayKey).headOption.map(_(JTAGDebugOverlayParams())).get
 
-  val topMod = LazyModule(new DevKitFPGADesign(wrangler.node)(p))
+  val topMod = LazyModule(new DevKitBoomFPGADesign(wrangler.node)(p))
 
   override lazy val module = new LazyRawModuleImp(this) {
     val (core, _) = coreClock.in(0)
@@ -62,11 +58,9 @@ class DevKitWrapper()(implicit p: Parameters) extends LazyModule
   }
 }
 
-case object DevKitFPGAFrequencyKey extends Field[Double](100.0)
-
-class DevKitFPGADesign(wranglerNode: ClockAdapterNode)(implicit p: Parameters) extends RocketSubsystem
-    with HasPeripheryMaskROMSlave
-    with HasPeripheryDebug
+class DevKitBoomFPGADesign(wranglerNode: ClockAdapterNode)(implicit p: Parameters) extends BoomSubsystem
+  with HasPeripheryMaskROMSlave
+  with HasPeripheryDebug
 {
   val tlclock = new FixedClockResource("tlclk", p(DevKitFPGAFrequencyKey))
 
@@ -119,11 +113,12 @@ class DevKitFPGADesign(wranglerNode: ClockAdapterNode)(implicit p: Parameters) e
 
   val leds = p(LEDOverlayKey).headOption.map(_(LEDOverlayParams()))
 
-  override lazy val module = new U500VC707DevKitSystemModule(this)
+  override lazy val module = new U500VC707BoomDevKitSystemModule(this)
 }
 
-class U500VC707DevKitSystemModule[+L <: DevKitFPGADesign](_outer: L)
-  extends RocketSubsystemModuleImp(_outer)
+
+class U500VC707BoomDevKitSystemModule[+L <: DevKitBoomFPGADesign](_outer: L)
+  extends BoomSubsystemModule(_outer)
     with HasRTCModuleImp
     with HasPeripheryDebugModuleImp
 {
@@ -142,20 +137,7 @@ class U500VC707DevKitSystemModule[+L <: DevKitFPGADesign](_outer: L)
   _outer.leds.get := gpio_cat
 }
 
-// Allow frequency of the design to be controlled by the Makefile
-class WithDevKitFrequency(MHz: Double) extends Config((site, here, up) => {
-  case DevKitFPGAFrequencyKey => MHz
-})
-
-class WithDevKit25MHz extends WithDevKitFrequency(25)
-class WithDevKit50MHz extends WithDevKitFrequency(50)
-class WithDevKit75MHz extends WithDevKitFrequency(75)
-class WithDevKit100MHz extends WithDevKitFrequency(100)
-class WithDevKit125MHz extends WithDevKitFrequency(125)
-class WithDevKit150MHz extends WithDevKitFrequency(150)
-class WithDevKit200MHz extends WithDevKitFrequency(200)
-
-class DevKitU500FPGADesign extends Config(
-  new U500DevKitConfig().alter((site, here, up) => {
-    case DesignKey => { (p:Parameters) => new DevKitWrapper()(p) }
+class DevKitBoomU500FPGADesign extends Config(
+  new BoomU500DevKitConfig().alter((site, here, up) => {
+    case DesignKey => { (p:Parameters) => new DevKitBoomWrapper()(p) }
   }))

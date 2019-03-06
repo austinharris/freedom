@@ -13,12 +13,25 @@ import sifive.blocks.devices.gpio._
 import sifive.blocks.devices.spi._
 import sifive.blocks.devices.uart._
 
+import boom.system._
+import boom.common._
+
 // Default FreedomU500Config
 class FreedomU500Config extends Config(
   new WithJtagDTM            ++
   new WithNMemoryChannels(1) ++
   new WithNBigCores(4)       ++
   new BaseConfig
+)
+
+class FreedomBoomU500Config extends Config(
+    new WithJtagDTM            ++
+    new WithNMemoryChannels(1) ++
+    new WithRVC ++
+    new DefaultBoomConfig ++
+    new WithoutTLMonitors ++
+    new WithNBoomCores(2) ++
+    new BaseConfig
 )
 
 // Freedom U500 Dev Kit Peripherals
@@ -54,4 +67,27 @@ class U500DevKitConfig extends Config(
       idcodeManufId = 0x489,  // As Assigned by JEDEC to SiFive. Only used in wrappers / test harnesses.
       debugIdleCycles = 5)    // Reasonable guess for synchronization
   })
+)
+
+
+class BoomU500DevKitConfig extends Config(
+  new WithNExtTopInterrupts(0)   ++
+  new U500DevKitPeripherals ++
+  new FreedomBoomU500Config().alter((site,here,up) => {
+    case SystemBusKey => up(SystemBusKey).copy(
+      errorDevice = Some(DevNullParams(
+      Seq(AddressSet(0x3000, 0xfff)),
+      maxAtomic=site(XLen)/8,
+      maxTransfer=128,
+      region = RegionType.TRACKED)))
+    case PeripheryBusKey => up(PeripheryBusKey, site).copy(frequency =
+      BigDecimal(site(DevKitFPGAFrequencyKey)*1000000).setScale(0, BigDecimal.RoundingMode.HALF_UP).toBigInt,
+      errorDevice = None)
+      case DTSTimebase => BigInt(1000000)
+      case JtagDTMKey => new JtagDTMConfig (
+        idcodeVersion = 2,      // 1 was legacy (FE310-G000, Acai).
+        idcodePartNum = 0x000,  // Decided to simplify.
+        idcodeManufId = 0x489,  // As Assigned by JEDEC to SiFive. Only used in wrappers / test harnesses.
+        debugIdleCycles = 5)    // Reasonable guess for synchronization
+    })
 )

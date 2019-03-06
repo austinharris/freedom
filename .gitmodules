@@ -6,7 +6,10 @@
 	url = https://github.com/sifive/sifive-blocks.git
 [submodule "fpga-shells"]
 	path = fpga-shells
-	url = https://github.com/sifive/fpga-shells
+	url = https://github.com/austinharris/fpga-shells
 [submodule "nvidia-dla-blocks"]
 	path = nvidia-dla-blocks
 	url = https://github.com/sifive/nvidia-dla-blocks.git
+[submodule "boom"]
+	path = boom
+	url = https://github.com/austinharris/riscv-boom.git
